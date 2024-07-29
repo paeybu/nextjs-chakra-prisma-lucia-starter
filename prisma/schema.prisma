@@ -14,70 +14,15 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  name      String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  accounts  Account[]
-  budgets   Budget[]
+  id            String    @id
+  sessions      Session[]
+  username      String    @unique
+  password_hash String
 }
 
-model Account {
-  id           Int           @id @default(autoincrement())
-  name         String
-  type         String //CHECKING, SAVINGS, CREDIT, CASH
-  balance      Float         @default(0.0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  userId       Int
-  user         User          @relation(fields: [userId], references: [id])
-  transactions Transaction[]
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
-
-model Budget {
-  id           Int           @id @default(autoincrement())
-  name         String
-  total        Float         @default(0.0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  userId       Int
-  user         User          @relation(fields: [userId], references: [id])
-  categories   Category[]
-  transactions Transaction[]
-}
-
-model Category {
-  id           Int           @id @default(autoincrement())
-  name         String
-  budgeted     Float         @default(0.0)
-  spent        Float         @default(0.0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  budgetId     Int
-  budget       Budget        @relation(fields: [budgetId], references: [id])
-  transactions Transaction[]
-}
-
-model Transaction {
-  id          Int       @id @default(autoincrement())
-  amount      Float
-  date        DateTime  @default(now())
-  description String?
-  accountId   Int
-  account     Account   @relation(fields: [accountId], references: [id])
-  budgetId    Int?
-  budget      Budget?   @relation(fields: [budgetId], references: [id])
-  categoryId  Int?
-  category    Category? @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-// enum AccountType {
-//   CHECKING
-//   SAVINGS
-//   CREDIT
-//   CASH
-// }
